@@ -9,6 +9,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { readJSON, writeJSON } from "@/lib/storage";
+import { formatRupiah } from "@/lib/format";
+import type { MenuItem } from "@/data/menu";
+import type { Product } from "@/data/products";
 
 export type CartLine = {
   id: string;
@@ -35,13 +39,28 @@ const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "kedai-seruni-cart";
 
 function loadInitialLines(): CartLine[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as CartLine[]) : [];
-  } catch {
-    return [];
-  }
+  const parsed = readJSON<unknown>(STORAGE_KEY, []);
+  return Array.isArray(parsed) ? (parsed as CartLine[]) : [];
+}
+
+export function menuToCartItem(m: MenuItem): Omit<CartLine, "qty"> {
+  return { id: `menu-${m.id}`, name: m.name, price: m.price, image: m.image };
+}
+
+export function productToCartItem(p: Product): Omit<CartLine, "qty"> {
+  return { id: `product-${p.id}`, name: p.name, price: p.price, image: p.image };
+}
+
+export function buildCheckoutMessage(lines: CartLine[], total: number): string {
+  const items = lines.map(
+    (l) => `- ${l.name} x${l.qty} = ${formatRupiah(l.price * l.qty)}`,
+  );
+  return [
+    "Halo Kedai Seruni! Saya mau pesan:",
+    ...items,
+    `Total: ${formatRupiah(total)}`,
+    "Terima kasih!",
+  ].join("\n");
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -49,11 +68,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-    } catch {
-      // abaikan jika storage penuh
-    }
+    writeJSON(STORAGE_KEY, lines);
   }, [lines]);
 
   const addItem = useCallback((item: Omit<CartLine, "qty">, qty = 1) => {

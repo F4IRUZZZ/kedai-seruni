@@ -3,8 +3,11 @@ export type MenuItem = {
   name: string;
   price: number;
   image: string;
-  category: "Kopi" | "Non-Kopi" | "Makanan";
+  category: MenuCategory;
 };
+
+export const MENU_CATEGORIES = ["Kopi", "Non-Kopi", "Makanan"] as const;
+export type MenuCategory = (typeof MENU_CATEGORIES)[number];
 
 export const menuItems: MenuItem[] = [
   { id: "americano", name: "Americano", price: 15000, image: "/img/menu/1.jpg", category: "Kopi" },
@@ -15,10 +18,4 @@ export const menuItems: MenuItem[] = [
   { id: "matcha-latte", name: "Matcha Latte", price: 20000, image: "/img/menu/coffee-beans.svg", category: "Non-Kopi" },
 ];
 
-export function formatRupiah(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(value);
-}
+export { formatRupiah } from "@/lib/format";

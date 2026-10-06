@@ -1,11 +1,12 @@
 import Image from "next/image";
+import SectionHeading from "@/components/SectionHeading";
 
 export default function About() {
   return (
     <section id="about" className="scroll-mt-24 px-[7%] py-24">
-      <h2 className="mb-12 text-center text-4xl font-bold text-white">
+      <SectionHeading className="mb-12">
         <span className="text-primary">Tentang</span> Kami
-      </h2>
+      </SectionHeading>
       <div className="flex flex-col gap-8 md:flex-row md:items-center">
         <div className="md:flex-1">
           <Image

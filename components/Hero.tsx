@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
 import { site, waLink } from "@/data/site";
+import { DEFAULT_ORDER_MESSAGE } from "@/data/contact";
 
 export default function Hero() {
   return (
@@ -21,14 +23,20 @@ export default function Hero() {
           di {site.city}.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="#menu"
+          <Link
+            href="/reservasi"
             className="rounded-md bg-primary px-8 py-3 text-lg font-medium text-white shadow transition-transform hover:scale-105"
           >
+            Reservasi Meja
+          </Link>
+          <Link
+            href="#menu"
+            className="rounded-md border border-white/60 px-8 py-3 text-lg font-medium text-white transition-colors hover:bg-white hover:text-ink"
+          >
             Lihat Menu
-          </a>
+          </Link>
           <a
-            href={waLink("Halo Kedai Seruni! Saya mau pesan kopi.")}
+            href={waLink(DEFAULT_ORDER_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-md border border-white/60 px-8 py-3 text-lg font-medium text-white transition-colors hover:bg-white hover:text-ink"

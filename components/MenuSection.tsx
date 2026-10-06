@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Plus } from "lucide-react";
-import { formatRupiah, menuItems, type MenuItem } from "@/data/menu";
-import { useCart } from "@/store/cart";
+import { MENU_CATEGORIES, menuItems, type MenuItem } from "@/data/menu";
+import { formatRupiah } from "@/lib/format";
+import { menuToCartItem, useCart } from "@/store/cart";
+import SectionHeading from "@/components/SectionHeading";
 
-const categories = ["Semua", "Kopi", "Non-Kopi", "Makanan"] as const;
+const categories = ["Semua", ...MENU_CATEGORIES] as const;
 
 export default function MenuSection({ query }: { query: string }) {
   const { addItem } = useCart();
@@ -21,17 +23,13 @@ export default function MenuSection({ query }: { query: string }) {
     });
   }, [query, category]);
 
-  const add = (m: MenuItem) =>
-    addItem({ id: `menu-${m.id}`, name: m.name, price: m.price, image: m.image });
+  const add = (m: MenuItem) => addItem(menuToCartItem(m));
 
   return (
     <section id="menu" className="scroll-mt-24 px-[7%] py-24">
-      <h2 className="mb-4 text-center text-4xl font-bold text-white">
+      <SectionHeading description="Diseduh fresh saat dipesan. Semua harga sudah termasuk pajak.">
         <span className="text-primary">Menu</span> Kami
-      </h2>
-      <p className="mx-auto mb-8 max-w-xl text-center font-light text-white/70">
-        Diseduh fresh saat dipesan. Semua harga sudah termasuk pajak.
-      </p>
+      </SectionHeading>
 
       <div className="mb-10 flex flex-wrap justify-center gap-2">
         {categories.map((c) => (

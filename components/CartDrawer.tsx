@@ -1,33 +1,38 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { Minus, Plus, Trash2, X } from "lucide-react";
-import { formatRupiah } from "@/data/menu";
+import { formatRupiah } from "@/lib/format";
 import { waLink } from "@/data/site";
-import { useCart } from "@/store/cart";
+import { buildCheckoutMessage, useCart } from "@/store/cart";
+import Backdrop from "@/components/ui/Backdrop";
+import EmptyState from "@/components/ui/EmptyState";
+import { useLockBody } from "@/hooks/useLockBody";
 
 export default function CartDrawer() {
   const { lines, total, count, isOpen, closeCart, removeItem, setQty, clear } =
     useCart();
 
-  const checkoutMessage = () => {
-    const items = lines.map((l) => `- ${l.name} x${l.qty} = ${formatRupiah(l.price * l.qty)}`);
-    return [
-      "Halo Kedai Seruni! Saya mau pesan:",
-      ...items,
-      `Total: ${formatRupiah(total)}`,
-      "Terima kasih!",
-    ].join("\n");
-  };
+  const checkoutMessage = () => buildCheckoutMessage(lines, total);
+
+  useLockBody(isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCart();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, closeCart]);
 
   return (
     <>
-      <div
-        onClick={closeCart}
-        aria-hidden="true"
-        className={`fixed inset-0 z-50 bg-black/50 transition-opacity ${
-          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
+      <Backdrop
+        label="Tutup keranjang"
+        visible={isOpen}
+        onClose={closeCart}
       />
       <aside
         aria-label="Keranjang belanja"
@@ -51,9 +56,9 @@ export default function CartDrawer() {
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {lines.length === 0 ? (
-            <p className="mt-10 text-center text-ink/60">
+            <EmptyState tone="light" className="mt-10 border-0 p-0">
               Keranjang masih kosong. Yuk pilih menu favoritmu!
-            </p>
+            </EmptyState>
           ) : (
             <ul className="flex flex-col gap-4">
               {lines.map((l) => (

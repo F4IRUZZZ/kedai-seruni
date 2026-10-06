@@ -1,24 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Eye, ShoppingCart, Star } from "lucide-react";
-import { formatRupiah } from "@/data/menu";
+import { Eye, ShoppingCart } from "lucide-react";
 import { products, type Product } from "@/data/products";
-import { useCart } from "@/store/cart";
-
-function Stars({ value }: { value: number }) {
-  return (
-    <div className="flex justify-center gap-0.5 text-primary">
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star
-          key={i}
-          size={18}
-          className={i < value ? "fill-primary" : "opacity-40"}
-        />
-      ))}
-    </div>
-  );
-}
+import { productToCartItem, useCart } from "@/store/cart";
+import Stars from "@/components/Stars";
+import ProductPrice from "@/components/ProductPrice";
+import SectionHeading from "@/components/SectionHeading";
 
 export default function ProductsSection({
   onDetail,
@@ -29,12 +17,9 @@ export default function ProductsSection({
 
   return (
     <section id="products" className="scroll-mt-24 px-[7%] py-24">
-      <h2 className="mb-4 text-center text-4xl font-bold text-white">
+      <SectionHeading description="Bawa pulang rasa Seruni. Biji disangrai fresh setiap minggu.">
         <span className="text-primary">Produk Unggulan</span> Kami
-      </h2>
-      <p className="mx-auto mb-12 max-w-xl text-center font-light text-white/70">
-        Bawa pulang rasa Seruni. Biji disangrai fresh setiap minggu.
-      </p>
+      </SectionHeading>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((p) => (
@@ -46,9 +31,7 @@ export default function ProductsSection({
               <button
                 type="button"
                 aria-label={`Tambah ${p.name} ke keranjang`}
-                onClick={() =>
-                  addItem({ id: `product-${p.id}`, name: p.name, price: p.price, image: p.image })
-                }
+                onClick={() => addItem(productToCartItem(p))}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:border-primary hover:bg-primary"
               >
                 <ShoppingCart size={18} />
@@ -76,14 +59,11 @@ export default function ProductsSection({
             <div className="mt-2">
               <Stars value={p.rating} />
             </div>
-            <p className="mt-2 font-bold text-white">
-              {formatRupiah(p.price)}{" "}
-              {p.originalPrice && (
-                <span className="ml-1 text-sm font-light text-white/50 line-through">
-                  {formatRupiah(p.originalPrice)}
-                </span>
-              )}
-            </p>
+            <ProductPrice
+              price={p.price}
+              originalPrice={p.originalPrice}
+              className="mt-2"
+            />
           </div>
         ))}
       </div>

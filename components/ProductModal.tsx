@@ -2,10 +2,13 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { ShoppingCart, Star, X } from "lucide-react";
-import { formatRupiah } from "@/data/menu";
+import { ShoppingCart, X } from "lucide-react";
 import type { Product } from "@/data/products";
-import { useCart } from "@/store/cart";
+import { productToCartItem, useCart } from "@/store/cart";
+import Stars from "@/components/Stars";
+import ProductPrice from "@/components/ProductPrice";
+import Backdrop from "@/components/ui/Backdrop";
+import { useLockBody } from "@/hooks/useLockBody";
 
 export default function ProductModal({
   product,
@@ -25,31 +28,31 @@ export default function ProductModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [product, onClose]);
 
+  useLockBody(product !== null);
+
   if (!product) return null;
 
   const buy = () => {
-    addItem({
-      id: `product-${product.id}`,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-    });
+    addItem(productToCartItem(product));
     onClose();
     openCart();
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Detail ${product.name}`}
-    >
+    <>
+      <Backdrop
+        label={`Tutup detail ${product.name}`}
+        visible
+        onClose={onClose}
+        className="z-[60] bg-black/60"
+      />
       <div
-        className="animate-modal-in relative w-full max-w-2xl rounded-lg bg-white p-6 text-ink"
-        onClick={(e) => e.stopPropagation()}
+        className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Detail ${product.name}`}
       >
+        <div className="animate-modal-in pointer-events-auto relative w-full max-w-2xl rounded-lg bg-white p-6 text-ink">
         <button
           type="button"
           aria-label="Tutup detail"
@@ -71,23 +74,15 @@ export default function ProductModal({
           <div>
             <h3 className="text-2xl font-bold">{product.name}</h3>
             <p className="mt-3 leading-relaxed text-ink/70">{product.description}</p>
-            <div className="mt-3 flex gap-0.5 text-primary">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star
-                  key={i}
-                  size={18}
-                  className={i < product.rating ? "fill-primary" : "opacity-40"}
-                />
-              ))}
+            <div className="mt-3 [&>div]:justify-start">
+              <Stars value={product.rating} />
             </div>
-            <p className="mt-3 text-xl font-bold">
-              {formatRupiah(product.price)}{" "}
-              {product.originalPrice && (
-                <span className="ml-1 text-sm font-light text-ink/50 line-through">
-                  {formatRupiah(product.originalPrice)}
-                </span>
-              )}
-            </p>
+            <ProductPrice
+              price={product.price}
+              originalPrice={product.originalPrice}
+              dark
+              className="mt-3 text-xl"
+            />
             <button
               type="button"
               onClick={buy}
@@ -97,7 +92,8 @@ export default function ProductModal({
             </button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

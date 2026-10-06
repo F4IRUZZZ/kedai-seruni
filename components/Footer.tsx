@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { navLinks } from "@/data/navigation";
+
 function InstagramIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -23,14 +26,6 @@ function FacebookIcon() {
     </svg>
   );
 }
-
-const links = [
-  { href: "#home", label: "Home" },
-  { href: "#about", label: "Tentang Kami" },
-  { href: "#menu", label: "Menu" },
-  { href: "#products", label: "Produk" },
-  { href: "#contact", label: "Kontak" },
-];
 
 export default function Footer() {
   return (
@@ -60,14 +55,14 @@ export default function Footer() {
       </div>
 
       <div className="mb-6 flex flex-wrap justify-center gap-x-2">
-        {links.map((l) => (
-          <a
+        {navLinks.map((l) => (
+          <Link
             key={l.href}
             href={l.href}
             className="px-4 py-2 text-white transition-colors hover:text-ink"
           >
             {l.label}
-          </a>
+          </Link>
         ))}
       </div>
 

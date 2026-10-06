@@ -2,22 +2,16 @@
 
 import { useState } from "react";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import Link from "next/link";
 import { useCart } from "@/store/cart";
-
-const links = [
-  { href: "#home", label: "Home" },
-  { href: "#about", label: "Tentang Kami" },
-  { href: "#menu", label: "Menu" },
-  { href: "#products", label: "Produk" },
-  { href: "#contact", label: "Kontak" },
-];
+import { navLinks } from "@/data/navigation";
 
 export default function Navbar({
-  query,
+  query = "",
   onQueryChange,
 }: {
-  query: string;
-  onQueryChange: (value: string) => void;
+  query?: string;
+  onQueryChange?: (value: string) => void;
 }) {
   const { count, openCart } = useCart();
   const [navOpen, setNavOpen] = useState(false);
@@ -26,31 +20,33 @@ export default function Navbar({
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-coffee bg-ink/80 backdrop-blur">
       <div className="flex items-center justify-between px-[7%] py-5">
-        <a href="#home" className="text-2xl font-bold italic text-white">
+        <Link href="/#home" className="text-2xl font-bold italic text-white">
           Kedai<span className="text-primary">Seruni</span>
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-8 md:flex">
-          {links.map((l) => (
-            <a
+          {navLinks.map((l) => (
+            <Link
               key={l.href}
               href={l.href}
               className="text-white transition-colors hover:text-primary"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Cari menu"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="p-2 text-white transition-colors hover:text-primary"
-          >
-            <Search size={22} />
-          </button>
+          {onQueryChange && (
+            <button
+              type="button"
+              aria-label="Cari menu"
+              onClick={() => setSearchOpen((v) => !v)}
+              className="p-2 text-white transition-colors hover:text-primary"
+            >
+              <Search size={22} />
+            </button>
+          )}
           <button
             type="button"
             aria-label="Buka keranjang"
@@ -75,13 +71,13 @@ export default function Navbar({
         </div>
       </div>
 
-      {searchOpen && (
+      {searchOpen && onQueryChange && (
         <div className="border-t border-white/10 bg-ink px-[7%] py-3">
           <input
             autoFocus
             type="search"
             value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
+            onChange={(e) => onQueryChange?.(e.target.value)}
             placeholder="Cari menu, misal: latte..."
             className="w-full rounded-md bg-white px-4 py-2.5 text-ink placeholder:text-ink/50 focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -90,15 +86,15 @@ export default function Navbar({
 
       {navOpen && (
         <div className="flex flex-col border-t border-white/10 bg-ink px-[7%] py-2 md:hidden">
-          {links.map((l) => (
-            <a
+          {navLinks.map((l) => (
+            <Link
               key={l.href}
               href={l.href}
               onClick={() => setNavOpen(false)}
               className="border-b border-white/5 py-3 text-lg text-white last:border-0 hover:text-primary"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </div>
       )}
